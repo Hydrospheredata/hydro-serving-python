@@ -1,9 +1,9 @@
-# hydro-serving-tensorflow
-TensorFlow runtime for [ML-Lambda](https://github.com/Hydrospheredata/hydro-serving).
-Provides GRPC API for a TensorFlow model saved with `SavedModelBuilder`.
-
+# hydro-serving-python
+Python runtime for [ML-Lambda](https://github.com/Hydrospheredata/hydro-serving).
+Provides GRPC API for a Python scripts.
+Supported versions are: python-3.4 python-3.5 python-3.6 python-3.7
 ## Build commands
 - `make test`
-- `make tf` - build docker runtime with tensorflow:latest-py3 base image
-- `make tf-${VERSION}` - build docker runtime with tensorflow:${VERSION}-py3 base image
+- `make python` - build docker runtime with python:latest-alpine base image
+- `make python-${VERSION}` - build docker runtime with python:${VERSION}-alpine base image
 - `make clean` - clean repository from temp files

@@ -6,10 +6,12 @@ from PythonRuntimeService import PythonRuntimeService
 
 class PythonRuntime:
 
-    def __init__(self, model_path, contract_path):
+    def __init__(self, model_path):
         self.port = None
         self.server = None
-        self.servicer = PythonRuntimeService(model_path, contract_path)
+        self.contract_path = "{}/contract.protobin".format(model_path)
+        self.model_path = "{}/files".format(model_path)
+        self.servicer = PythonRuntimeService(self.model_path, self.contract_path)
 
     def start(self, port="9090", max_workers=10):
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))

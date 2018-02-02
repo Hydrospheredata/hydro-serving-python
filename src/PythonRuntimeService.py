@@ -5,7 +5,7 @@ import importlib
 
 class PythonRuntimeService(hs.PredictionServiceServicer):
     def __init__(self, model_path, contract_path):
-        self.model_path = "{}/src/func_main.py".format(model_path)
+        self.model_path = "{}/func_main.py".format(model_path)
 
         self.module_path = self.model_path.replace('.py', '')
         self.module_path = self.module_path.replace('/', '.')

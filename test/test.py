@@ -42,16 +42,15 @@ class RuntimeTests(unittest.TestCase):
                 )
             ]
         )
-        with open("contracts/calculator_contract.protobin", "wb") as file:
+        with open("models/calculator/contract.protobin", "wb") as file:
             file.write(contract.SerializeToString())
 
     @staticmethod
     def delete_contract():
-        os.remove("contracts/calculator_contract.protobin")
+        os.remove("models/calculator/contract.protobin")
 
     def test_correct_signature(self):
-        self.generate_contract()
-        runtime = PythonRuntime("models/calculator", "contracts/calculator_contract.protobin")
+        runtime = PythonRuntime("models/calculator")
         runtime.start(port="9090")
 
         try:
@@ -93,7 +92,6 @@ class RuntimeTests(unittest.TestCase):
             )
             self.assertEqual(result, expected)
         finally:
-            self.delete_contract()
             runtime.stop()
 
     # def test_incorrect_signature(self):
