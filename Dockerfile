@@ -3,7 +3,7 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine
 
 ADD . /app/
 
-RUN pip install -r requirements.txt
+RUN pip install -r app/requirements.txt
 
 ENV APP_PORT=9090
 ENV SIDECAR_PORT=8080
