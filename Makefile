@@ -1,5 +1,3 @@
-RUNTIME_VERSION=0.0.1
-SIDECAR_VERSION=0.0.1
 PYTHON_EXEC=python
 
 .PHONY: python
@@ -10,8 +8,8 @@ python-all: python-3.4 python-3.5 python-3.6 python-3.7
 
 .PHONY: python-%
 python-%:
-	$(eval RUNTIME_NAME = hydrosphere/serving-grpc-runtime-python-$*)
-	docker build --no-cache --build-arg PYTHON_IMAGE_VERSION=$* --build-arg SIDECAR_VERSION=$(SIDECAR_VERSION) -t $(RUNTIME_NAME):$(RUNTIME_VERSION) .
+	$(eval RUNTIME_NAME = hydrosphere/serving-runtime-python-$*)
+	docker build --no-cache --build-arg PYTHON_IMAGE_VERSION=$* --build-arg SIDECAR_VERSION=$(SIDECAR_VERSION) -t $(RUNTIME_NAME):latest .
 
 run:
 	${PYTHON_EXEC} src/main.py
