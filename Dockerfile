@@ -1,6 +1,8 @@
 ARG PYTHON_IMAGE_VERSION=latest
 FROM python:${PYTHON_IMAGE_VERSION}-alpine
 
+ADD . /app/
+
 RUN pip install -r requirements.txt
 
 ENV APP_PORT=9090
@@ -14,4 +16,4 @@ VOLUME /model
 
 WORKDIR /app/src
 
-CMD ["/hydro-serving/sidecar/start.sh"]
+CMD ["/app/start.sh"]
