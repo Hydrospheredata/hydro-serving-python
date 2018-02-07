@@ -1,10 +1,10 @@
 PYTHON_EXEC=python
 
+.PHONY: python-all
+python-all: python-3.4 python-3.5 python-3.6
+
 .PHONY: python
 python: python-latest
-
-.PHONY: python-all
-python-all: python-3.4 python-3.5 python-3.6 python-3.7
 
 .PHONY: python-%
 python-%:

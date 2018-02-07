@@ -1,5 +1,5 @@
 ARG PYTHON_IMAGE_VERSION=latest
-FROM python:${PYTHON_IMAGE_VERSION}-alpine
+FROM python:${PYTHON_IMAGE_VERSION}-slim
 
 ADD . /app/
 
