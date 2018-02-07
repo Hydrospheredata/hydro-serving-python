@@ -1,7 +1,5 @@
 #!/bin/sh
 
-SERVICE_ID=$1
-
 chmod +x /app/src/main.py
 sync 
 
