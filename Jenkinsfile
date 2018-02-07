@@ -2,8 +2,7 @@
 versions = [
         "3.4",
         "3.5",
-        "3.6",
-        "3.7"
+        "3.6"
 ]
 
 def checkoutSource(gitCredentialId, organization, repository) {
