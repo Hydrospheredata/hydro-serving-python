@@ -50,7 +50,8 @@ class RuntimeTests(unittest.TestCase):
         os.remove("models/calculator/contract.protobin")
 
     def test_correct_signature(self):
-        runtime = PythonRuntime("models/calculator")
+        path = os.path.abspath("models/calculator")
+        runtime = PythonRuntime(path)
         runtime.start(port="9090")
 
         try:

@@ -1,14 +1,15 @@
 import hydro_serving_grpc as hs
 import grpc
 import importlib
+import sys
 
 
 class PythonRuntimeService(hs.PredictionServiceServicer):
     def __init__(self, model_path, contract_path):
         self.model_path = "{}/func_main.py".format(model_path)
-
         self.module_path = self.model_path.replace('.py', '')
-        self.module_path = self.module_path.replace('/', '.')
+        self.module_path = self.module_path.replace('/', '.')[1:]
+        sys.path.append(model_path)
 
         contract = hs.ModelContract()
         with open(contract_path, "rb") as file:
@@ -30,7 +31,7 @@ class PythonRuntimeService(hs.PredictionServiceServicer):
             context.set_details("{} signature is not present in the model".format(model_spec.signature_name))
             return hs.PredictResponse()
 
-        module = importlib.import_module(self.module_path)
+        module = importlib.import_module("func_main")
         executable = getattr(module, selected_signature.signature_name)
         result = executable(**request.inputs)
         if not isinstance(result, hs.PredictResponse):
