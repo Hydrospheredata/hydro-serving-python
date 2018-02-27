@@ -117,8 +117,8 @@ node("JenkinsOnDemand") {
             for (int i = 0; i < versions.size(); i++) { //TODO switch to each after JENKINS-26481
                 def ver = versions.get(i)
 
-                sh "docker tag hydrosphere/serving-runtime-python-${ver}:latest hydrosphere/serving-runtime-python-${ver}:${imageVersion}"
-                sh "docker push hydrosphere/serving-runtime-python-${ver}:${imageVersion}"
+                sh "docker tag hydrosphere/serving-runtime-python:${ver}-latest hydrosphere/serving-runtime-python:${ver}-${imageVersion}"
+                sh "docker push hydrosphere/serving-runtime-python:${ver}-${imageVersion}"
             }
         }
 
@@ -145,7 +145,7 @@ node("JenkinsOnDemand") {
                 for (int i = 0; i < versions.size(); i++) { //TODO switch to each after JENKINS-26481
                     def ver = versions.get(i)
 
-                    sh "docker push hydrosphere/serving-runtime-python-${ver}:latest"
+                    sh "docker push hydrosphere/serving-runtime-python:${ver}-latest"
                 }
             }
         }

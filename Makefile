@@ -8,8 +8,7 @@ python: python-latest
 
 .PHONY: python-%
 python-%:
-	$(eval RUNTIME_NAME = hydrosphere/serving-runtime-python-$*)
-	docker build --no-cache --build-arg PYTHON_IMAGE_VERSION=$* --build-arg SIDECAR_VERSION=$(SIDECAR_VERSION) -t $(RUNTIME_NAME):latest .
+	docker build --no-cache --build-arg PYTHON_IMAGE_VERSION=$* --build-arg SIDECAR_VERSION=$(SIDECAR_VERSION) -t hydrosphere/serving-runtime-python:$*-latest .
 
 run:
 	${PYTHON_EXEC} src/main.py
