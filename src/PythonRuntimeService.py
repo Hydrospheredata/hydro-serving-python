@@ -2,10 +2,12 @@ import hydro_serving_grpc as hs
 import grpc
 import importlib
 import sys
+import logging
 
 
 class PythonRuntimeService(hs.PredictionServiceServicer):
     def __init__(self, model_path, contract_path):
+        self.logger = logging.getLogger("PythonRuntimeService")
         self.model_path = "{}/func_main.py".format(model_path)
         self.module_path = self.model_path.replace('.py', '')
         self.module_path = self.module_path.replace('/', '.')[1:]
@@ -18,7 +20,7 @@ class PythonRuntimeService(hs.PredictionServiceServicer):
 
     def Predict(self, request, context):
         model_spec = request.model_spec
-        print("Received inference request: {}".format(request))
+        self.logger.info("Received inference request: {}".format(request))
 
         selected_signature = None
 
@@ -35,10 +37,10 @@ class PythonRuntimeService(hs.PredictionServiceServicer):
         executable = getattr(module, selected_signature.signature_name)
         result = executable(**request.inputs)
         if not isinstance(result, hs.PredictResponse):
-            print("Type of a result ({}) is not `PredictResponse`".format(result))
+            self.logger.warning("Type of a result ({}) is not `PredictResponse`".format(result))
             context.set_code(grpc.StatusCode.OUT_OF_RANGE)
             context.set_details("Type of a result ({}) is not `PredictResponse`".format(result))
             return hs.PredictResponse()
 
-        print("Answer: {}".format(result))
+        self.logger.info("Answer: {}".format(result))
         return result

@@ -1,14 +1,20 @@
 import os
 from PythonRuntime import PythonRuntime
 import time
+import logging
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
-PORT = os.getenv("APP_GRPC_PORT", "9090")
+PORT = os.getenv("APP_PORT", "9090")
+
+logging.basicConfig(level=logging.INFO)
+
+print("main")
 
 if __name__ == '__main__':
-    print("Reading the model...")
+    logger = logging.getLogger("main")
+    logger.info("Reading the model...")
     runtime = PythonRuntime("/model")
-    print("Runtime is ready to serve...")
+    logger.info("Runtime is ready to serve...")
     runtime.start(port=PORT)
     try:
         while True:

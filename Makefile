@@ -8,7 +8,7 @@ python: python-latest
 
 .PHONY: python-%
 python-%:
-	docker build --no-cache --build-arg PYTHON_IMAGE_VERSION=$* --build-arg SIDECAR_VERSION=$(SIDECAR_VERSION) -t hydrosphere/serving-runtime-python:$*-latest .
+	docker build --no-cache --build-arg PYTHON_IMAGE_VERSION=$* -t hydrosphere/serving-runtime-python:$*-latest .
 
 run:
 	${PYTHON_EXEC} src/main.py
