@@ -28,14 +28,14 @@ def isReleaseJob() {
 
 def generateTagComment(releaseVersion) {
     commitsList = sh(
-        returnStdout: true,
-        script: "git log `git tag --sort=-taggerdate | head -1`..HEAD --pretty=\"%B\n\r (%an)\""
+            returnStdout: true,
+            script: "git log `git tag --sort=-taggerdate | head -1`..HEAD --pretty=\"@%an %h %B\""
     ).trim()
     return "${commitsList}"
 }
 
 def createReleaseInGithub(gitCredentialId, organization, repository, releaseVersion, message) {
-    bodyMessage = message.replaceAll("\n", "<br />").replace("\r", "")
+    bodyMessage = message.replaceAll("\r", "").replaceAll("\n", "<br/>").replaceAll("<br/><br/>", "<br/>")
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitCredentialId, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
         def request = """
             {
@@ -81,7 +81,7 @@ def calculateNextDevVersion(releaseVersion) {
 node("JenkinsOnDemand") {
     def repository = 'hydro-serving-python'
     def organization = 'Hydrospheredata'
-    def gitCredentialId = 'HydrospheredataGithubAccessKey'
+    def gitCredentialId = 'HydroRobot_AccessToken'
 
     stage('Checkout') {
         deleteDir()
@@ -122,15 +122,15 @@ node("JenkinsOnDemand") {
             }
         }
 
-        stage("Create tag"){
+        stage("Create tag") {
             def curVersion = currentVersion()
-            tagComment=generateTagComment(curVersion)
+            tagComment = generateTagComment(curVersion)
             sh "git commit -a -m 'Releasing ${curVersion}'"
             sh "git tag -a ${curVersion} -m '${tagComment}'"
 
             sh "git checkout ${env.BRANCH_NAME}"
 
-            def nextVersion=calculateNextDevVersion(curVersion)
+            def nextVersion = calculateNextDevVersion(curVersion)
             changeVersion(nextVersion)
 
             sh "git commit -a -m 'Development version increased: ${nextVersion}'"

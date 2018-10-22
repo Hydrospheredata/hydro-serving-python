@@ -91,6 +91,7 @@ class RuntimeTests(unittest.TestCase):
                     )
                 }
             )
+            print(result)
             self.assertEqual(result, expected)
         finally:
             runtime.stop()
