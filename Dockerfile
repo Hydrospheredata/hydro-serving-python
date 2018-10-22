@@ -3,6 +3,10 @@ FROM python:${PYTHON_IMAGE_VERSION}-slim
 
 ADD . /app/
 
+RUN apt-get update
+
+RUN apt-get -y install libgomp1
+
 RUN pip install -r /app/requirements.txt
 
 ENV APP_PORT=9090
