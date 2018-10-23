@@ -24,9 +24,9 @@ class PythonRuntime:
         self.servicer = PythonRuntimeService(self.model_path, self.contract_path)
         self.logger = logging.getLogger("main")
 
-    def start(self, port="9090", max_workers=10):
-        options = [(cygrpc.ChannelArgKey.max_send_message_length, 256 * 1024 * 1024),
-                   (cygrpc.ChannelArgKey.max_receive_message_length, 256 * 1024 * 1024)]
+    def start(self, port="9090", max_workers=10, max_message_size=256*1024*1024):
+        options = [(cygrpc.ChannelArgKey.max_send_message_length, max_message_size),
+                   (cygrpc.ChannelArgKey.max_receive_message_length, max_message_size)]
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers), options=options)
         hs.add_PredictionServiceServicer_to_server(self.servicer, self.server)
         addr = "[::]:{}".format(port)
