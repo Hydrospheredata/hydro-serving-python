@@ -1,6 +1,8 @@
 import grpc
 from concurrent import futures
 import hydro_serving_grpc as hs
+from grpc._cython import cygrpc
+
 from PythonRuntimeService import PythonRuntimeService
 import sys
 import os
@@ -23,7 +25,9 @@ class PythonRuntime:
         self.logger = logging.getLogger("main")
 
     def start(self, port="9090", max_workers=10):
-        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
+        options = [(cygrpc.ChannelArgKey.max_send_message_length, 256 * 1024 * 1024),
+                   (cygrpc.ChannelArgKey.max_receive_message_length, 256 * 1024 * 1024)]
+        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers), options=options)
         hs.add_PredictionServiceServicer_to_server(self.servicer, self.server)
         addr = "[::]:{}".format(port)
         self.logger.info("Starting server on {}".format(addr))
