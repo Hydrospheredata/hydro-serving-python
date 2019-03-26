@@ -4,6 +4,8 @@ import grpc
 import sys
 import os
 
+from google.protobuf.empty_pb2 import Empty
+
 sys.path.append("../src")
 from PythonRuntime import PythonRuntime
 import hydro_serving_grpc as hs
@@ -93,6 +95,11 @@ class RuntimeTests(unittest.TestCase):
             )
             print(result)
             self.assertEqual(result, expected)
+
+            status = client.Status(Empty())
+            print(status)
+            self.assertEqual(status.status, 2)
+            self.assertEqual(status.message, "ok")
         finally:
             runtime.stop()
 

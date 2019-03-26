@@ -1,6 +1,5 @@
 def repository = 'hydro-serving-python'
 def versions = [
-        "3.4",
         "3.5",
         "3.6",
         "3.7"
