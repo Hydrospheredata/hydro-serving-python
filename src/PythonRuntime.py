@@ -8,6 +8,7 @@ import sys
 import os
 import logging
 
+
 class PythonRuntime:
     def __init__(self, model_path):
         self.port = None

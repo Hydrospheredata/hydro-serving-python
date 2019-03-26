@@ -20,7 +20,7 @@ class PythonRuntimeService(PredictionServiceServicer):
             contract.ParseFromString(file.read())
             self.contract = contract
 
-        self.status = "INITIALIZING"
+        self.status = "UNKNOWN"
         self.status_message = "Preparing to import func_main"
         try:
             self.module = importlib.import_module("func_main")
@@ -44,9 +44,7 @@ class PythonRuntimeService(PredictionServiceServicer):
             self.logger.info("Answer: {}".format(result)[:256])
             return result
         except Exception as ex:
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(repr(ex))
-            return hs.tf.api.PredictResponse()
+            context.abort(grpc.StatusCode.INTERNAL, repr(ex))
 
     def Status(self, request, context):
         return hs.tf.api.StatusResponse(
