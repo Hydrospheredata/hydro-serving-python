@@ -1,5 +1,5 @@
 # hydro-serving-python
-Python runtime for [ML-Lambda](https://github.com/Hydrospheredata/hydro-serving).
+Python runtime for [Hydrosphere Serving](https://github.com/Hydrospheredata/hydro-serving).
 Provides GRPC API for a Python scripts.
 Supported versions are: python-3.4 python-3.5 python-3.6
 
