@@ -22,6 +22,7 @@ class PythonRuntimeService(PredictionServiceServicer):
 
         self.status = "UNKNOWN"
         self.status_message = "Preparing to import func_main"
+        self.error = None
         try:
             self.module = importlib.import_module("func_main")
             self.executable = getattr(self.module, self.contract.predict.signature_name)
@@ -29,23 +30,30 @@ class PythonRuntimeService(PredictionServiceServicer):
             self.status_message = "ok"
         except Exception as ex:
             logging.exception("Error during func_main import. Runtime is in invalid state.")
+            self.error = ex
             self.status = "NOT_SERVING"
             self.status_message = "'func_main' import error: {}".format(ex)
 
     def Predict(self, request, context):
-        self.logger.info("Received inference request: {}".format(request)[:256])
-        try:
-            result = self.executable(**request.inputs)
-            if not isinstance(result, hs.PredictResponse):
-                self.logger.warning("Type of a result ({}) is not `PredictResponse`".format(result))
-                context.set_code(grpc.StatusCode.OUT_OF_RANGE)
-                context.set_details("Type of a result ({}) is not `PredictResponse`".format(result))
-                return hs.PredictResponse()
+        if self.error:
+            context.abort(
+                grpc.StatusCode.INTERNAL,
+                "func_main is not imported due to error: {}".format(str(self.error))
+            )
+        else:
+            self.logger.info("Received inference request: {}".format(request)[:256])
+            try:
+                result = self.executable(**request.inputs)
+                if not isinstance(result, hs.PredictResponse):
+                    self.logger.warning("Type of a result ({}) is not `PredictResponse`".format(result))
+                    context.set_code(grpc.StatusCode.OUT_OF_RANGE)
+                    context.set_details("Type of a result ({}) is not `PredictResponse`".format(result))
+                    return hs.PredictResponse()
 
-            self.logger.info("Answer: {}".format(result)[:256])
-            return result
-        except Exception as ex:
-            context.abort(grpc.StatusCode.INTERNAL, repr(ex))
+                self.logger.info("Answer: {}".format(result)[:256])
+                return result
+            except Exception as ex:
+                context.abort(grpc.StatusCode.INTERNAL, repr(ex))
 
     def Status(self, request, context):
         return hs.tf.api.StatusResponse(
