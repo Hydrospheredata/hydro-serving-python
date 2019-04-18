@@ -28,8 +28,7 @@ class PythonRuntimeService(PredictionServiceServicer):
             self.status = "SERVING"
             self.status_message = "ok"
         except Exception as ex:
-            logging.error("Error during func_main import. Runtime is in invalid state.")
-            logging.error(str(ex))
+            logging.exception("Error during func_main import. Runtime is in invalid state.")
             self.status = "NOT_SERVING"
             self.status_message = "'func_main' import error: {}".format(ex)
 
