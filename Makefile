@@ -18,7 +18,7 @@ run:
 test: test-runtime
 
 test-runtime:
-	cd test && $(PYTHON_EXEC) test.py
+	pytest test	
 
 clean: clean-pyc
 

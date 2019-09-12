@@ -3,7 +3,7 @@ from concurrent import futures
 import hydro_serving_grpc as hs
 from grpc._cython import cygrpc
 
-from PythonRuntimeService import PythonRuntimeService
+from src.PythonRuntimeService import PythonRuntimeService
 import sys
 import os
 import logging

@@ -53,6 +53,7 @@ class PythonRuntimeService(PredictionServiceServicer):
                 self.logger.info("Answer: {}".format(result)[:256])
                 return result
             except Exception as ex:
+                self.logger.exception("Function {} failed to handle request".format(self.contract.predict.signature_name))
                 context.abort(grpc.StatusCode.INTERNAL, repr(ex))
 
     def Status(self, request, context):
