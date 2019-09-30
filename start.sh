@@ -4,4 +4,4 @@ chmod +x /app/src/main.py
 sync 
 
 cd /app/src
-exec python3 main.py
+PYTHONPATH=/app:/app/src/ python3 main.py
