@@ -1,12 +1,15 @@
-import grpc
+import logging
+import os
+import sys
 from concurrent import futures
+
+import grpc
+import grpc_health
 import hydro_serving_grpc as hs
 from grpc._cython import cygrpc
+from grpc_health.v1.health_pb2_grpc import add_HealthServicer_to_server as health_add
 
-from src.PythonRuntimeService import PythonRuntimeService
-import sys
-import os
-import logging
+from src.prediction_service import PythonRuntimeService
 
 
 class PythonRuntime:
@@ -30,6 +33,7 @@ class PythonRuntime:
                    (cygrpc.ChannelArgKey.max_receive_message_length, max_message_size)]
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers), options=options)
         hs.add_PredictionServiceServicer_to_server(self.servicer, self.server)
+        health_add(self.servicer, self.server)
         addr = "[::]:{}".format(port)
         self.logger.info("Starting server on {}".format(addr))
         self.server.add_insecure_port(addr)

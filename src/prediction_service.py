@@ -4,10 +4,13 @@ import importlib
 import sys
 import logging
 
+from grpc_health.v1.health_pb2 import HealthCheckRequest, HealthCheckResponse
+from grpc_health.v1.health_pb2_grpc import HealthServicer
+
 from hydro_serving_grpc.tf.api import PredictionServiceServicer
 
 
-class PythonRuntimeService(PredictionServiceServicer):
+class PythonRuntimeService(PredictionServiceServicer, HealthServicer):
     def __init__(self, model_path, contract_path):
         self.logger = logging.getLogger("PythonRuntimeService")
         self.model_path = "{}/func_main.py".format(model_path)
@@ -20,19 +23,21 @@ class PythonRuntimeService(PredictionServiceServicer):
             contract.ParseFromString(file.read())
             self.contract = contract
 
-        self.status = "UNKNOWN"
+        self.status = "NOT_SERVING"
         self.status_message = "Preparing to import func_main"
         self.error = None
         try:
             self.module = importlib.import_module("func_main")
             self.executable = getattr(self.module, self.contract.predict.signature_name)
             self.status = "SERVING"
-            self.status_message = "ok"
+            self.status_message = "OK"
+            logging.info("Initialization ok")
         except Exception as ex:
             logging.exception("Error during func_main import. Runtime is in invalid state.")
             self.error = ex
             self.status = "NOT_SERVING"
             self.status_message = "'func_main' import error: {}".format(ex)
+            raise ex
 
     def Predict(self, request, context):
         if self.error:
@@ -61,3 +66,6 @@ class PythonRuntimeService(PredictionServiceServicer):
             status=self.status,
             message=self.status_message
         )
+
+    def Check(self, request, context):
+        return HealthCheckResponse(status=self.status)
