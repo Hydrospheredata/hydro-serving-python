@@ -1,10 +1,13 @@
-import hydro_serving_grpc as hs
-import grpc
 import importlib
-import sys
 import logging
+import sys
+from typing import Dict
 
+import grpc
+import hydro_serving_grpc as hs
+import numpy as np
 from hydro_serving_grpc.tf.api import PredictionServiceServicer
+from hydrosdk.data.conversions import tensor_proto_to_nparray, nparray_to_tensor_proto
 
 
 class PythonRuntimeService(PredictionServiceServicer):
@@ -43,15 +46,21 @@ class PythonRuntimeService(PredictionServiceServicer):
         else:
             self.logger.info("Received inference request: {}".format(request)[:256])
             try:
-                result = self.executable(**request.inputs)
-                if not isinstance(result, hs.PredictResponse):
-                    self.logger.warning("Type of a result ({}) is not `PredictResponse`".format(result))
+                numpy_request_inputs: Dict[str, np.array] = {k: tensor_proto_to_nparray(t) for k, t in request.inputs.items()}
+                numpy_outputs: Dict[str, np.array] = self.executable(**numpy_request_inputs)
+
+                try:
+                    tensor_proto_outputs = {k: nparray_to_tensor_proto(v) for k, v in numpy_outputs.items()}
+                    result = hs.PredictResponse(outputs=tensor_proto_outputs)
+                    self.logger.info("Answer: {}".format(result)[:256])
+                    return result
+                except ValueError as e:
+                    error_message = "Could not convert numpy output ({}) to tensor proto. {}".format(numpy_outputs, e)
+                    self.logger.warning(error_message)
                     context.set_code(grpc.StatusCode.OUT_OF_RANGE)
-                    context.set_details("Type of a result ({}) is not `PredictResponse`".format(result))
+                    context.set_details(error_message)
                     return hs.PredictResponse()
 
-                self.logger.info("Answer: {}".format(result)[:256])
-                return result
             except Exception as ex:
                 self.logger.exception("Function {} failed to handle request".format(self.contract.predict.signature_name))
                 context.abort(grpc.StatusCode.INTERNAL, repr(ex))
