@@ -1,9 +1,10 @@
 def repository = 'hydro-serving-python'
 def versions = [
-        "3.5",
         "3.6",
-        "3.7"
+        "3.7",
+        "3.8"
 ]
+
 def pythonImages = versions.collect {"hydrosphere/serving-runtime-python-${it}"}
 
 def buildFunction={
