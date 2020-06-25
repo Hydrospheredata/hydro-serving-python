@@ -6,7 +6,7 @@ import os
 
 from google.protobuf.empty_pb2 import Empty
 
-from src.runtime import PythonRuntime
+from src.main import PythonRuntime
 import hydro_serving_grpc as hs
 
 

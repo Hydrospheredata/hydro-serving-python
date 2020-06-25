@@ -1,28 +1,32 @@
 ARG PYTHON_IMAGE_VERSION=latest
 FROM python:${PYTHON_IMAGE_VERSION}-slim
+ARG GRPC_HEALTH_PROBE_VERSION=v0.3.1
 
 ENV APP_PORT=9091
 ENV MODEL_DIR=/model
+VOLUME /model
 LABEL DEPLOYMENT_TYPE=APP
 
-RUN apt-get update
+RUN apt-get update && \
+    apt-get -y install wget libgomp1
 
-RUN apt-get -y install wget libgomp1
-
-RUN GRPC_HEALTH_PROBE_VERSION=v0.3.1 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
     chmod +x /bin/grpc_health_probe
 
 HEALTHCHECK --start-period=10s CMD /bin/grpc_health_probe -addr=:${APP_PORT}
 
 ADD . /app/
 
-RUN pip install -r /app/requirements.txt
+RUN useradd -u 42069 app && \
+    mkdir /home/app && \
+    chown app /home/app && \
+    chown app /app && \
+    chmod +x /app/start.sh
 
-VOLUME /model
+USER app
+
+RUN pip install --user -r /app/requirements.txt
 
 WORKDIR /app/src
-
-RUN chmod +x /app/start.sh
 
 CMD ["/app/start.sh"]
