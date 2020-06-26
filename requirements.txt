@@ -3,6 +3,5 @@ hydro-serving-grpc==2.2.1
 docker~=3.0
 pytest
 hydrosdk==2.3.2
-
 pandas~=1.0.3
 numpy~=1.18.3

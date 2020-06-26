@@ -10,6 +10,7 @@ from hydro_serving_grpc.tf.api import PredictionServiceServicer
 from hydrosdk.data.conversions import tensor_proto_to_np, np_to_tensor_proto
 
 
+
 class PythonRuntimeService(PredictionServiceServicer):
     def __init__(self, model_path, contract_path):
         self.logger = logging.getLogger("PythonRuntimeService")
@@ -51,6 +52,7 @@ class PythonRuntimeService(PredictionServiceServicer):
 
                 try:
                     tensor_proto_outputs: Dict[str, TensorProto] = {k: np_to_tensor_proto(v) for k, v in numpy_outputs.items()}
+
                     result = hs.PredictResponse(outputs=tensor_proto_outputs)
                     self.logger.info("Answer: {}".format(result)[:256])
                     return result
