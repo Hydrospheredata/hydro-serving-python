@@ -16,8 +16,6 @@ ENV MODEL_DIR=/model
 
 LABEL DEPLOYMENT_TYPE=APP
 
-VOLUME /model
-
 WORKDIR /app/src
 
 RUN chmod +x /app/start.sh
