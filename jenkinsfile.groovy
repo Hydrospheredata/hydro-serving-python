@@ -32,7 +32,7 @@ def checkVersion(String hubVersion){
   IMAGEVERSIONS.each {
     IMAGELIST = sh(script: "curl -Ls 'https://registry.hub.docker.com/v2/repositories/hydrosphere/serving-runtime-python-${it}/tags?page_size=1024' | jq -r '.results[].name'", returnStdout: true, label: "Get images tag from dockerhub" ).trim()
     IMAGELIST.each { item ->
-      if ( item == "${hubVersion}"){
+      if ( $item == "${hubVersion}"){
         echo "Image tag ${hubVersion} already exist"
         exit 1
       }
@@ -119,7 +119,7 @@ def releaseService(String xVersion, String yVersion){
 
 def buildDocker(){
     //run build command and store build tag 
-    tagVersion = sdkVersion
+    tagVersion = hydrosphereVersion
     IMAGEVERSIONS.each {
       sh script:"make VERSION=${tagVersion} python-${it}", label: "Run build docker python-${it}"
     }
@@ -151,7 +151,10 @@ node('hydrocentral') {
           //Set sdkVersion
           sdkVersion = sh(script: "curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r .info.version", returnStdout: true, label: "get sdk version").trim()
         }
-      checkVersion(sdkVersion)
+      withCredentials([usernamePassword(credentialsId: 'HydroRobot_AccessToken', passwordVariable: 'Githubpassword', usernameVariable: 'Githubusername')]) {
+        hydrosphereVersion = sh(script: "git ls-remote --tags --sort='v:refname' --refs 'https://$Githubusername:$Githubpassword@github.com/Hydrospheredata/hydro-serving.git' | sed \"s/.*\\///\" | grep -v \"[a-z]\" | tail -n1", returnStdout: true, label: "get global hydrosphere version").trim()
+      }
+      checkVersion(hydrosphereVersion)
     }
 
     stage('Test'){
@@ -163,7 +166,7 @@ node('hydrocentral') {
     stage('Release'){
       if (BRANCH_NAME == 'master' || BRANCH_NAME == 'main' ){ //Run only manual from master
         oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
-        newVersion = sdkVersion
+        newVersion = hydrosphereVersion
         //bump version
         sh(script: "echo ${newVersion} > version", label: "Bump local version file")
         bumpGrpc(sdkVersion,SEARCHSDK, params.patchVersion,SEARCHPATH) 
@@ -175,14 +178,14 @@ node('hydrocentral') {
     }
     //post if success
     if (params.releaseType == 'local' && BRANCH_NAME == 'master'){
-            slackMessage()
+        //    slackMessage()
         }
     } catch (e) {
     //post if failure
         currentBuild.result = 'FAILURE'
-        if (params.releaseType == 'local' && BRANCH_NAME == 'master'){
-            slackMessage()
-        }
+        // if (params.releaseType == 'local' && BRANCH_NAME == 'master'){
+        //     slackMessage()
+        // }
         throw e
     }
 }
