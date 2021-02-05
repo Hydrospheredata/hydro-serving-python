@@ -36,7 +36,7 @@ def checkVersion(String hubVersion){
         echo "Image tag ${hubVersion} already exist"
         sh script: "exit 1"
       } else {
-        sh script: "New images with tag ${hubVersion} will be created!"
+        echo "New images with tag ${hubVersion} will be created!"
       }
     }
 }
