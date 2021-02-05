@@ -26,13 +26,13 @@ def checkoutRepo(String repo){
   git changelog: false, credentialsId: 'HydroRobot_AccessToken', poll: false, url: repo
 }
 
-def checkVersion(String newVersion){
+def checkVersion(String hubVersion){
   //check version exist in dockerhub
   IMAGEVERSIONS.each {
-    IMAGELIST = sh(script: "curl -Ls 'https://registry.hub.docker.com/v2/repositories/hydrosphere/serving-runtime-python-${it}/tags?page_size=1024' | jq -r '.results[].name'", label: "Get images tag from dockerhub" ).trim()
+    IMAGELIST = sh(script: "curl -Ls 'https://registry.hub.docker.com/v2/repositories/hydrosphere/serving-runtime-python-${it}/tags?page_size=1024' | jq -r '.results[].name'", returnStdout: true, label: "Get images tag from dockerhub" ).trim()
     IMAGELIST.each { item ->
-      if ($newVersion == $item){
-        echo "Image tag ${newVersion} already exist"
+      if ($hubVersion == $item){
+        echo "Image tag ${hubVersion} already exist"
         exit 1
       }
     }
@@ -118,7 +118,7 @@ def releaseService(String xVersion, String yVersion){
 
 def buildDocker(){
     //run build command and store build tag 
-    tagVersion = grpcVersion
+    tagVersion = sdkVersion
     IMAGEVERSIONS.each {
       sh script:"make VERSION=${tagVersion} python-${it}", label: "Run build docker python-${it}"
     }
