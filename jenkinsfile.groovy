@@ -29,15 +29,16 @@ def checkoutRepo(String repo){
 def checkVersion(String hubVersion){
   echo "${hubVersion}"
   //check version exist in dockerhub
-  IMAGEVERSIONS.each {
-    IMAGELIST = sh(script: "curl -Ls 'https://registry.hub.docker.com/v2/repositories/hydrosphere/serving-runtime-python-${it}/tags?page_size=1024' | jq -r '.results[].name'", returnStdout: true, label: "Get images tag from dockerhub" ).trim()
-    IMAGELIST.each { item ->
-      if ( $item == "${hubVersion}"){
+    IMAGELIST = sh(script: "curl -Ls 'https://registry.hub.docker.com/v2/repositories/hydrosphere/serving-runtime-python-3.6/tags?page_size=1024' | jq -r '.results[].name'", returnStdout: true, label: "Get images tag from dockerhub" ).split()
+    sh script: "echo ${IMAGELIST.size()}"
+    for ( i in IMAGELIST ){
+      if ( i == "${hubVersion}"){
         echo "Image tag ${hubVersion} already exist"
-        exit 1
+        sh script: "exit 1"
+      } else {
+        sh script: "New images with tag ${hubVersion} will be created!"
       }
     }
-  }
 }
 
 def bumpGrpc(String newVersion, String search, String patch, String path){
