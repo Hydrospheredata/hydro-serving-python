@@ -184,5 +184,4 @@ node('hydrocentral') {
         }
         throw e
     }
-    }
 }
