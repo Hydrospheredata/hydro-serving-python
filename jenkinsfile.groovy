@@ -164,7 +164,7 @@ node('hydrocentral') {
         oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
         newVersion = sdkVersion
         //bump version
-        sh(script: "echo ${newVersion} > version"
+        sh(script: "echo ${newVersion} > version", label: "Bump local version file")
         bumpGrpc(sdkVersion,SEARCHSDK, params.patchVersion,SEARCHPATH) 
         bumpGrpc(grpcVersion,SEARCHGRPC, params.patchVersion,SEARCHPATH)
         buildDocker()
