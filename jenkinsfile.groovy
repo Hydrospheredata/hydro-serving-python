@@ -27,11 +27,12 @@ def checkoutRepo(String repo){
 }
 
 def checkVersion(String hubVersion){
+  echo "${hubVersion}"
   //check version exist in dockerhub
   IMAGEVERSIONS.each {
     IMAGELIST = sh(script: "curl -Ls 'https://registry.hub.docker.com/v2/repositories/hydrosphere/serving-runtime-python-${it}/tags?page_size=1024' | jq -r '.results[].name'", returnStdout: true, label: "Get images tag from dockerhub" ).trim()
     IMAGELIST.each { item ->
-      if ($hubVersion == $item){
+      if ( item == "${hubVersion}"){
         echo "Image tag ${hubVersion} already exist"
         exit 1
       }
