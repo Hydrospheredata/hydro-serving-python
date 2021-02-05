@@ -161,7 +161,7 @@ node('hydrocentral') {
     }
 
     stage('Release'){
-      if (BRANCH_NAME == 'master' && params.release == 'true' || BRANCH_NAME == 'main' && params.release == 'true' ){ //Run only manual from master
+      if (BRANCH_NAME == 'master' || BRANCH_NAME == 'main' ){ //Run only manual from master
         oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
         newVersion = sdkVersion
         //bump version
