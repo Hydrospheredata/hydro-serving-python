@@ -35,10 +35,9 @@ def checkVersion(String hubVersion){
       if ( i == "${hubVersion}"){
         echo "Image tag ${hubVersion} already exist"
         sh script: "exit 1"
-      } else {
-        echo "New images with tag ${hubVersion} will be created!"
       }
     }
+        echo "New images with tag ${hubVersion} will be created!"
 }
 
 def bumpGrpc(String newVersion, String search, String patch, String path){
