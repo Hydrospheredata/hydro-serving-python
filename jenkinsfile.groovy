@@ -30,8 +30,8 @@ def checkVersion(String newVersion){
   //check version exist in dockerhub
   IMAGEVERSIONS.each {
     IMAGELIST = sh(script: "curl -Ls 'https://registry.hub.docker.com/v2/repositories/hydrosphere/serving-runtime-python-${it}/tags?page_size=1024' | jq -r '.results[].name'", label: "Get images tag from dockerhub" ).trim()
-    for vers in $IMAGELIST {
-      if ($newVersion == $vers){
+    IMAGELIST.each { item ->
+      if ($newVersion == $item){
         echo "Image tag ${newVersion} already exist"
         exit 1
       }
