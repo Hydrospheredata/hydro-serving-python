@@ -154,7 +154,9 @@ node('hydrocentral') {
       withCredentials([usernamePassword(credentialsId: 'HydroRobot_AccessToken', passwordVariable: 'Githubpassword', usernameVariable: 'Githubusername')]) {
         hydrosphereVersion = sh(script: "git ls-remote --tags --sort='v:refname' --refs 'https://$Githubusername:$Githubpassword@github.com/Hydrospheredata/hydro-serving.git' | sed \"s/.*\\///\" | grep -v \"[a-z]\" | tail -n1", returnStdout: true, label: "get global hydrosphere version").trim()
       }
-      checkVersion(hydrosphereVersion)
+      if (releaseType == 'global'){
+        checkVersion(hydrosphereVersion)
+      }
     }
 
     stage('Test'){
@@ -164,16 +166,18 @@ node('hydrocentral') {
     }
 
     stage('Release'){
-      if (BRANCH_NAME == 'master' || BRANCH_NAME == 'main' ){ //Run only manual from master
-        oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
-        newVersion = hydrosphereVersion
-        //bump version
-        sh(script: "echo ${newVersion} > version", label: "Bump local version file")
-        bumpGrpc(sdkVersion,SEARCHSDK, params.patchVersion,SEARCHPATH) 
-        bumpGrpc(grpcVersion,SEARCHGRPC, params.patchVersion,SEARCHPATH)
-        buildDocker()
-        pushDocker(REGISTRYURL, SERVICEIMAGENAME, newVersion)
-        releaseService(oldVersion, newVersion)
+      if (releaseType == 'global'){
+        if (BRANCH_NAME == 'master' || BRANCH_NAME == 'main' ){ //Run only manual from master
+          oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
+          newVersion = hydrosphereVersion
+          //bump version
+          sh(script: "echo ${newVersion} > version", label: "Bump local version file")
+          bumpGrpc(sdkVersion,SEARCHSDK, params.patchVersion,SEARCHPATH) 
+          bumpGrpc(grpcVersion,SEARCHGRPC, params.patchVersion,SEARCHPATH)
+          buildDocker()
+          pushDocker(REGISTRYURL, SERVICEIMAGENAME, newVersion)
+          releaseService(oldVersion, newVersion)
+        }
       }
     }
     //post if success
