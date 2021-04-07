@@ -1,9 +1,11 @@
 import importlib
 import logging
+import os
 import sys
 from typing import Dict
 
 import grpc
+import google
 from hydro_serving_grpc.serving.runtime.api_pb2_grpc import PredictionServiceServicer
 from hydro_serving_grpc.serving.contract.tensor_pb2 import Tensor
 from hydro_serving_grpc.serving.contract.signature_pb2 import ModelSignature
@@ -19,8 +21,13 @@ class PythonRuntimeService(PredictionServiceServicer):
         sys.path.append(model_path)
 
         signature = ModelSignature()
+        if not os.path.exists(signature_path):
+            raise FileNotFoundError(f"Couldn't find serialized signature at {signature_path}")
         with open(signature_path, "rb") as file:
-            signature.ParseFromString(file.read())
+            try: 
+                signature.ParseFromString(file.read())
+            except google.protobuf.message.DecodeError as e:
+                raise ValueError(f"Couldn't parse serialized signature at {signature_path}: {e}") from e
             self.signature = signature
 
         self.status = "UNKNOWN"
