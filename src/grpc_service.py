@@ -3,7 +3,6 @@ import logging
 import sys
 import os
 from typing import Dict
-import google
 import grpc
 from hydro_serving_grpc.serving.runtime.api_pb2_grpc import PredictionServiceServicer
 from hydro_serving_grpc.serving.contract.tensor_pb2 import Tensor
@@ -40,13 +39,13 @@ def load_model(model_path):
 
     module = importlib.import_module("func_main")
     executable = getattr(module, signature.signature_name)
-    logging.info("Initialization status: ok")
+    logging.info(f"Got {signature.signature_name} function from the module")
 
     return PythonGRPCService(executable, signature)
 
 class PythonGRPCService(PredictionServiceServicer, HealthServicer):
     def __init__(self, executable, signature):
-        self.logger = logging.getLogger("PythonGRPCEndpoint")
+        self.logger = logging.getLogger("PythonGRPCService")
         self.executable = executable
         self.signature  = signature
 
