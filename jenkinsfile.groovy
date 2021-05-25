@@ -156,7 +156,11 @@ node('hydrocentral') {
           sdkVersion = sh(script: "curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r .info.version", returnStdout: true, label: "get sdk version").trim()
         }
       withCredentials([usernamePassword(credentialsId: 'HydroRobot_AccessToken', passwordVariable: 'Githubpassword', usernameVariable: 'Githubusername')]) {
-        hydrosphereVersion = sh(script: "git ls-remote --tags --sort='v:refname' --refs 'https://$Githubusername:$Githubpassword@github.com/Hydrospheredata/hydro-serving.git' | sed \"s/.*\\///\" | grep -v \"[a-z]\" | tail -n1", returnStdout: true, label: "get global hydrosphere version").trim()
+       if (params.newVersion == ''){
+         hydrosphereVersion = sh(script: "git ls-remote --tags --sort='v:refname' --refs 'https://$Githubusername:$Githubpassword@github.com/Hydrospheredata/hydro-serving.git' | sed \"s/.*\\///\" | grep -v \"[a-z]\" | tail -n1", returnStdout: true, label: "get global hydrosphere version").trim()
+       } else {
+         hydrosphereVersion = params.newVersion
+       }
       }
       if (params.releaseType == 'global'){
         checkVersion(hydrosphereVersion)
