@@ -3,10 +3,11 @@ import time
 import grpc
 import sys
 import os
-
+import logging
 from google.protobuf.empty_pb2 import Empty
 
-from src.PythonRuntime import PythonRuntime
+from src.grpc_server import GRPCServer
+import hydro_serving_grpc as hs
 from hydro_serving_grpc.serving.contract.signature_pb2 import ModelSignature
 from hydro_serving_grpc.serving.contract.field_pb2 import ModelField
 from hydro_serving_grpc.serving.contract.tensor_pb2 import Tensor, TensorShape
@@ -14,6 +15,7 @@ from hydro_serving_grpc.serving.contract.types_pb2 import DT_INT8
 from hydro_serving_grpc.serving.runtime.api_pb2_grpc import PredictionServiceStub
 from hydro_serving_grpc.serving.runtime.api_pb2 import PredictRequest, PredictResponse
 
+logging.basicConfig(level=logging.DEBUG)
 
 class RuntimeTests(unittest.TestCase):
     @staticmethod
@@ -43,7 +45,7 @@ class RuntimeTests(unittest.TestCase):
     def test_correct_signature(self):
         self.generate_signature()
         path = os.path.abspath("test/models/calculator")
-        runtime = PythonRuntime(path)
+        runtime = GRPCServer(path)
         runtime.start(port="9090")
 
         try:

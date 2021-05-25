@@ -1,30 +1,17 @@
 import grpc
 from concurrent import futures
-import hydro_serving_grpc as hs
 from grpc._cython import cygrpc
 
-from src.PythonRuntimeService import PythonRuntimeService
+from src.grpc_service import load_model
 from hydro_serving_grpc.serving.runtime.api_pb2_grpc import add_PredictionServiceServicer_to_server
-import sys
-import os
 import logging
 
-
-class PythonRuntime:
+class GRPCServer:
     def __init__(self, model_path):
         self.port = None
         self.server = None
-        self.signature_path = os.path.join(model_path, "contract.protobin")
-        self.files_path = os.path.join(model_path, "files")
-        self.model_path = os.path.join(self.files_path, "src")
-        self.lib_path = os.path.join(model_path, "lib")
-
-        if os.path.exists(self.lib_path):
-            print("Added `{}` to PYTHON_PATH".format(self.lib_path))
-            sys.path.append(self.lib_path)
-
-        self.servicer = PythonRuntimeService(self.model_path, self.signature_path)
-        self.logger = logging.getLogger("main")
+        self.servicer = load_model(model_path)
+        self.logger = logging.getLogger("GRPCServer")
 
     def start(self, port="9090", max_workers=10, max_message_size=256*1024*1024):
         options = [(cygrpc.ChannelArgKey.max_send_message_length, max_message_size),
