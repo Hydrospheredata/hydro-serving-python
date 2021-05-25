@@ -158,7 +158,7 @@ node('hydrocentral') {
       withCredentials([usernamePassword(credentialsId: 'HydroRobot_AccessToken', passwordVariable: 'Githubpassword', usernameVariable: 'Githubusername')]) {
         hydrosphereVersion = sh(script: "git ls-remote --tags --sort='v:refname' --refs 'https://$Githubusername:$Githubpassword@github.com/Hydrospheredata/hydro-serving.git' | sed \"s/.*\\///\" | grep -v \"[a-z]\" | tail -n1", returnStdout: true, label: "get global hydrosphere version").trim()
       }
-      if (releaseType == 'global'){
+      if (params.releaseType == 'global'){
         checkVersion(hydrosphereVersion)
       }
     }
