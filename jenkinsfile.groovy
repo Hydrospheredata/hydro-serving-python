@@ -181,7 +181,7 @@ node('hydrocentral') {
           //bump version
           sh(script: "echo ${newVersion} > version", label: "Bump local version file")
           bumpGrpc(sdkVersion,SEARCHSDK, params.patchVersion,SEARCHPATH) 
-          bumpGrpc(grpcVersion,SEARCHGRPC, params.patchVersion,SEARCHPATH)
+//          bumpGrpc(grpcVersion,SEARCHGRPC, params.patchVersion,SEARCHPATH)
           buildDocker()
           pushDocker(REGISTRYURL, SERVICEIMAGENAME, newVersion)
           releaseService(oldVersion, newVersion)
