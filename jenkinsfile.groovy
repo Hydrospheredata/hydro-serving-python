@@ -170,7 +170,7 @@ node('hydrocentral') {
     }
 
     stage('Release'){
-      if (releaseType == 'global'){
+      if (params.releaseType == 'global'){
         if (BRANCH_NAME == 'master' || BRANCH_NAME == 'main' ){ //Run only manual from master
           oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
           newVersion = hydrosphereVersion
