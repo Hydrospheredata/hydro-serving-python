@@ -17,6 +17,9 @@ HEALTHCHECK --start-period=10s CMD /bin/grpc_health_probe -addr=:${APP_PORT}
 
 ADD . /app/
 
+RUN chmod +x /app/src/main.py
+RUN sync 
+
 RUN useradd -u 42069 app && \
     mkdir /home/app && \
     chown app /home/app && \
