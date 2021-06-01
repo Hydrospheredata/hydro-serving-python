@@ -42,17 +42,12 @@ def checkVersion(String hubVersion){
 }
 
 def bumpGrpc(String newVersion, String search, String patch, String path){
-    //Use poetry
-    //check current version
-    sh script: "poetry version -s"
-    sh script: "poetry version ${params.patchVersion}"
-
-    // sh script: "cat $path | grep '$search' > tmp", label: "Store search value in tmp file"
-    // currentVersion = sh(script: "cat tmp | cut -d'%' -f4 | sed 's/\"//g' | sed 's/,//g' | sed 's/^.*=//g'", returnStdout: true, label: "Get current version").trim()
-    // sh script: "sed -i -E \"s/$currentVersion/$newVersion/\" tmp", label: "Bump temp version"
-    // sh script: "sed -i 's/\\\"/\\\\\"/g' tmp", label: "remove quote and space from version"
-    // sh script: "sed -i \"s/.*$search.*/\$(cat tmp)/g\" $path", label: "Change version"
-    // sh script: "rm -rf tmp", label: "Remove temp file"
+    sh script: "cat $path | grep '$search' > tmp", label: "Store search value in tmp file"
+    currentVersion = sh(script: "cat tmp | cut -d'%' -f4 | sed 's/\"//g' | sed 's/,//g' | sed 's/^.*=//g'", returnStdout: true, label: "Get current version").trim()
+    sh script: "sed -i -E \"s/$currentVersion/$newVersion/\" tmp", label: "Bump temp version"
+    sh script: "sed -i 's/\\\"/\\\\\"/g' tmp", label: "remove quote and space from version"
+    sh script: "sed -i \"s/.*$search.*/\$(cat tmp)/g\" $path", label: "Change version"
+    sh script: "rm -rf tmp", label: "Remove temp file"
 }
 
 def slackMessage(){
@@ -174,11 +169,10 @@ node('hydrocentral') {
     stage('Release'){
       if (params.releaseType == 'global'){
         if (BRANCH_NAME == 'master' || BRANCH_NAME == 'main' ){ //Run only manual from master
-          oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
-          newVersion = hydrosphereVersion
+          oldVersion = sh(script: "poetry version -s", returnStdout: true ,label: "get version").trim()
+          newVersion = sh(script: "poetry version ${params.patchVersion}", returnStdout: true ,label: "bump version").trim()
           //bump version
           sh(script: "echo ${newVersion} > version", label: "Bump local version file")
-          //TODO: change to poetry use 
           bumpGrpc(sdkVersion,SEARCHSDK, params.patchVersion,SEARCHPATH) 
           buildDocker()
           pushDocker(REGISTRYURL, SERVICEIMAGENAME, newVersion)
