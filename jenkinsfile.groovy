@@ -42,12 +42,17 @@ def checkVersion(String hubVersion){
 }
 
 def bumpGrpc(String newVersion, String search, String patch, String path){
-    sh script: "cat $path | grep '$search' > tmp", label: "Store search value in tmp file"
-    currentVersion = sh(script: "cat tmp | cut -d'%' -f4 | sed 's/\"//g' | sed 's/,//g' | sed 's/^.*=//g'", returnStdout: true, label: "Get current version").trim()
-    sh script: "sed -i -E \"s/$currentVersion/$newVersion/\" tmp", label: "Bump temp version"
-    sh script: "sed -i 's/\\\"/\\\\\"/g' tmp", label: "remove quote and space from version"
-    sh script: "sed -i \"s/.*$search.*/\$(cat tmp)/g\" $path", label: "Change version"
-    sh script: "rm -rf tmp", label: "Remove temp file"
+    //Use poetry
+    //check current version
+    sh script: "poetry version -s"
+    sh script: "poetry version ${params.patchVersion}"
+
+    // sh script: "cat $path | grep '$search' > tmp", label: "Store search value in tmp file"
+    // currentVersion = sh(script: "cat tmp | cut -d'%' -f4 | sed 's/\"//g' | sed 's/,//g' | sed 's/^.*=//g'", returnStdout: true, label: "Get current version").trim()
+    // sh script: "sed -i -E \"s/$currentVersion/$newVersion/\" tmp", label: "Bump temp version"
+    // sh script: "sed -i 's/\\\"/\\\\\"/g' tmp", label: "remove quote and space from version"
+    // sh script: "sed -i \"s/.*$search.*/\$(cat tmp)/g\" $path", label: "Change version"
+    // sh script: "rm -rf tmp", label: "Remove temp file"
 }
 
 def slackMessage(){
