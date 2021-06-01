@@ -2,7 +2,7 @@ properties([
   parameters([
     choice(choices: ['addon','minor','major','patch','tag'], name: 'patchVersion', description: 'What needs to be bump?'),
     string(defaultValue:'', description: 'Force set newVersion or leave empty', name: 'newVersion', trim: false),
-    string(defaultValue:'', description: 'Set grpcVersion or leave empty', name: 'grpcVersion', trim: false),
+   // string(defaultValue:'', description: 'Set grpcVersion or leave empty', name: 'grpcVersion', trim: false),
     string(defaultValue:'', description: 'Set sdkVersion or leave empty', name: 'sdkVersion', trim: false),
     choice(choices: ['local', 'global'], name: 'releaseType', description: 'It\'s local release or global?'),
    ])
@@ -11,12 +11,11 @@ properties([
 SERVICENAME = 'hydro-serving-python'
 SEARCHPATH = './requirements.txt'
 SEARCHSDK = 'hydrosdk'
-SEARCHGRPC = 'hydro-serving-grpc'
+//SEARCHGRPC = 'hydro-serving-grpc'
 TESTCMD = 'make test'
 REGISTRYURL = 'hydrosphere'
 SERVICEIMAGENAME = 'serving-runtime-python'
 IMAGEVERSIONS = [
-        "3.6",
         "3.7",
         "3.8"
 ]
