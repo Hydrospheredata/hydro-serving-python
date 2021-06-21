@@ -2,7 +2,6 @@ properties([
   parameters([
     choice(choices: ['addon','minor','major','patch','tag'], name: 'patchVersion', description: 'What needs to be bump?'),
     string(defaultValue:'', description: 'Force set newVersion or leave empty', name: 'newVersion', trim: false),
-    string(defaultValue:'', description: 'Set grpcVersion or leave empty', name: 'grpcVersion', trim: false),
     string(defaultValue:'', description: 'Set sdkVersion or leave empty', name: 'sdkVersion', trim: false),
     choice(choices: ['local', 'global'], name: 'releaseType', description: 'It\'s local release or global?'),
    ])
@@ -11,12 +10,10 @@ properties([
 SERVICENAME = 'hydro-serving-python'
 SEARCHPATH = './requirements.txt'
 SEARCHSDK = 'hydrosdk'
-SEARCHGRPC = 'hydro-serving-grpc'
 TESTCMD = 'make test'
 REGISTRYURL = 'hydrosphere'
 SERVICEIMAGENAME = 'serving-runtime-python'
 IMAGEVERSIONS = [
-        "3.6",
         "3.7",
         "3.8"
 ]
@@ -147,10 +144,6 @@ node('hydrocentral') {
       sh script: "git config --global user.email \"robot@hydrosphere.io\"", label: "Set user email"
       checkoutRepo("https://github.com/Hydrospheredata/${SERVICENAME}.git")
       AUTHOR = sh(script:"git log -1 --pretty=format:'%an'", returnStdout: true, label: "get last commit author").trim()
-      if (params.grpcVersion == ''){
-          //Set grpcVersion
-          grpcVersion = sh(script: "curl -Ls https://pypi.org/pypi/hydro-serving-grpc/json | jq -r .info.version", returnStdout: true, label: "get grpc version").trim()
-        }
       if (params.sdkVersion == ''){
           //Set sdkVersion
           sdkVersion = sh(script: "curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r .info.version", returnStdout: true, label: "get sdk version").trim()
@@ -176,12 +169,11 @@ node('hydrocentral') {
     stage('Release'){
       if (params.releaseType == 'global'){
         if (BRANCH_NAME == 'master' || BRANCH_NAME == 'main' ){ //Run only manual from master
-          oldVersion = sh(script: "cat \"version\" | sed 's/\\\"/\\\\\"/g'", returnStdout: true ,label: "get version").trim()
-          newVersion = hydrosphereVersion
+          oldVersion = sh(script: "poetry version -s", returnStdout: true ,label: "get version").trim()
+          newVersion = sh(script: "poetry version ${params.patchVersion}", returnStdout: true ,label: "bump version").trim()
           //bump version
           sh(script: "echo ${newVersion} > version", label: "Bump local version file")
           bumpGrpc(sdkVersion,SEARCHSDK, params.patchVersion,SEARCHPATH) 
-//          bumpGrpc(grpcVersion,SEARCHGRPC, params.patchVersion,SEARCHPATH)
           buildDocker()
           pushDocker(REGISTRYURL, SERVICEIMAGENAME, newVersion)
           releaseService(oldVersion, newVersion)
