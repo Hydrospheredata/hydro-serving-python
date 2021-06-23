@@ -16,12 +16,13 @@ jobs:
         run: |
           IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
           echo $IMAGE
-          echo "::set-output name=get-images::$IMAGE"
+          echo "IMAGES=$IMAGE" >> $GITHUB_ENV
       
 
       - name: Inspect images
         run: |
-          for i in ${{steps.run_tests.outputs.get-images}}
+          echo ${{ env.IMAGES }}
+          for i in ${{ env.IMAGES }}
           do
             docker image inspect $i
           done  
