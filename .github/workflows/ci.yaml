@@ -4,8 +4,6 @@ on: pull_request
 jobs:
   Test:
     runs-on: ubuntu-latest
-    env:
-      IMAGES: ''
     steps:
       - name: Checkout
         uses: actions/checkout@v2      
@@ -14,14 +12,16 @@ jobs:
         run: "make python-all -e VERSION=${{ github.sha }}"
         
       - name: Get list images 
+        id: get-images
         run: |
           IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
           echo $IMAGE
-          export IMAGES=$IMAGE
+          echo "::set-output name=get-images::$IMAGE"
+      
 
       - name: Inspect images
         run: |
-          for i in ${{ env.IMAGES }}
+          for i in ${{steps.run_tests.outputs.get-images}}
           do
             docker image inspect $i
           done  
