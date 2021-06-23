@@ -120,10 +120,17 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Get list images 
-        run: export IMAGE=$(docker images | grep serving-runtime | awk '{print $1":"$2}')
+        id: get-images
+        run: |
+          echo IMAGES=$(docker images | grep serving-runtime | awk '{print $1":"$2}'') >> $GITHUB_ENV
 
       - name: Push image
-        run: for i in $IMAGE; do [docker push hydrosphere/$i]; done
+        run: |
+          echo ${{ env.IMAGES }}
+          for i in ${{ env.IMAGES }}
+          do
+            docker push hydrosphere/$i
+          done  
         
       - name: Tag and push changes
         id: tag
@@ -157,7 +164,7 @@ jobs:
         SLACK_ICON: https://avatars.githubusercontent.com/u/17550625?s=200&v=4
         SLACK_COLOR: ${{ job.status }}
         SLACK_TITLE: Build status - success
-        SLACK_MESSAGE: "Releasing hydro-serving-runtime ${{ needs.Release.outputs.tag }} :rocket:"
+        SLACK_MESSAGE: "Releasing ${{ env.IMAGES }} :rocket:"
         MSG_MINIMAL: true
 
     - name: Slack Notification failure
