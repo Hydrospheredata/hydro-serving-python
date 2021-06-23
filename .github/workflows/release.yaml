@@ -1,0 +1,173 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - 'release/**'
+      
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: bump rule (major|minor|patch|premajor|preminor|prepatch|prerelease)
+        default: prerelease
+        required: false
+        
+      version:
+        description: manual version
+        default: ''
+        required: false
+        
+      sdk_version:
+        description: manual sdk version
+        default: ''
+        required: false
+        
+      release:
+        description: release type (local|global)
+        default: local
+        required: false
+        
+# Secrets:
+#   pypi_token - pypi API token
+      
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+    env:
+      BUMP: prerelease # default values for push-triggered run
+      RELEASE: local
+    steps:
+      - name: Validate inputs  #TODO create an action for this
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          case ${{ github.event.inputs.bump }} in
+            major)
+              ;;
+            premajor)
+              ;;
+            minor)
+              ;;
+            preminor)
+              ;;
+            patch)
+              ;;
+            prepatch)
+              ;;
+            prerelease)
+              ;;
+            *)
+              echo "invalid bump rule: ${{ github.event.inputs.bump }}"
+              exit 1
+              ;;
+          esac
+          
+          case ${{ github.event.inputs.release }} in 
+            local)
+              ;;
+            global)
+              ;;
+            *)
+              echo invalid release type: ${{ github.event.inputs.release }}
+              exit 1
+              ;;
+          esac
+          
+          echo BUMP=${{ github.event.inputs.bump }} >> $GITHUB_ENV
+          echo RELEASE=${{ github.event.inputs.release }} >> $GITHUB_ENV
+              
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.7
+          
+      - name: Setup poetry
+        uses: abatilo/actions-poetry@v2.1.0
+        
+      - name: Bump sdk
+        if: github.event.inputs.sdk_version == '' && env.RELEASE == 'local'
+        run: |
+          SDK_VERSION=$(curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r '.releases | keys[-1]')
+          echo $SDK_VERSION
+          poetry add hydrosdk=$SDK_VERSION
+          
+      - name: Bump sdk to latest stable version
+        if: github.event.inputs.sdk_version == '' && env.RELEASE == 'global'
+        run: |
+          SDK_VERSION=$(curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r .info.version)
+          echo $SDK_VERSION
+          poetry add hydrosdk=$SDK_VERSION
+          
+      - name: Set manual sdk version
+        if: github.event.inputs.sdk_version != ''
+        run: poetry add hydrosdk=${{ github.event.inputs.sdk_version }}
+                  
+      - name: Build with version
+        if: github.events.inputs.version == ''
+        run: make python-all -e VERSION=${{ env.BUMP }}
+        
+      - name: Build with force version
+        if: github.events.inputs.version != ''
+        run: make python-all -e VERSION=${{ github.events.inputs.version }}
+        
+      - name: Docker Login
+        uses: docker/login-action@v1.9.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Get list images 
+        run: export IMAGE=$(docker images | grep serving-runtime | awk '{print $1":"$2}')
+
+      - name: Push image
+        run: for i in $IMAGE; do [docker push hydrosphere/$i]; done
+        
+      - name: Tag and push changes
+        id: tag
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a --allow-empty -m "release version $(poetry version -s)"
+          git tag $(poetry version -s)
+          git push
+          git push --tags
+
+      - name: Reports
+        id: generate-output
+        run: echo "::set-output name=tag-output::$(poetry version -s)"
+
+    outputs:
+      tag: ${{ steps.generate-output.outputs.tag-output }}
+          
+  slackNotification:
+    name: Slack Notification
+    needs: Release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Slack Notification success
+      if: ${{ success() }}
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: hydrosphere
+        SLACK_USERNAME: HydroRobot
+        SLACK_ICON: https://avatars.githubusercontent.com/u/17550625?s=200&v=4
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_TITLE: Build status - success
+        SLACK_MESSAGE: "Releasing hydro-serving-runtime ${{ needs.Release.outputs.tag }} :rocket:"
+        MSG_MINIMAL: true
+
+    - name: Slack Notification failure
+      if: ${{ failure() }}
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: hydrosphere
+        SLACK_USERNAME: HydroRobot
+        SLACK_ICON: https://avatars.githubusercontent.com/u/17550625?s=200&v=4
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_TITLE: Build status - failure
+        SLACK_MESSAGE: "Check build $GITHUB_RUN_ID status"
+        MSG_MINIMAL: true
