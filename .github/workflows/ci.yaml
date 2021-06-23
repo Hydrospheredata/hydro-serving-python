@@ -8,11 +8,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Python
-        uses: actions/setup-python@v2.2.2
-        with:
-          python-version: 3.7
-
       - name: Setup poetry
         uses: abatilo/actions-poetry@v2.1.0
         
@@ -20,7 +15,7 @@ jobs:
         run: poetry install
 
       - name: Test code
-        run: make test
+        run: poetry run pytest test
 
       - name: Build image
         run: make python-all -e VERSION=${{ github.sha }}
