@@ -16,7 +16,7 @@ jobs:
         run: |
           IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
           echo $IMAGE
-          echo "IMAGES=$IMAGE" >> $GITHUB_ENV
+          echo IMAGES=$(docker images | grep serving-runtime | awk '{print $3}') >> $GITHUB_ENV
       
 
       - name: Inspect images
