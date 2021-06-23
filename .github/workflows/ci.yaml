@@ -2,9 +2,10 @@ name: ci
 on: pull_request
 
 jobs:
-
   Test:
     runs-on: ubuntu-latest
+    env:
+      IMAGES: ''
     steps:
       - name: Checkout
         uses: actions/checkout@v2      
@@ -16,10 +17,11 @@ jobs:
         run: |
           IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
           echo $IMAGE
+          ${{ env.IMAGES }}=$IMAGE
 
       - name: Inspect images
         run: |
-          for i in $IMAGE
+          for i in ${{ env.IMAGES }}
           do
             docker image inspect $i
           done  

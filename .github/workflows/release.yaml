@@ -36,7 +36,7 @@ jobs:
     env:
       BUMP: prerelease # default values for push-triggered run
       RELEASE: local
-      IMAGE: ''
+      IMAGES: ''
     steps:
       - name: Validate inputs  #TODO create an action for this
         if: github.event_name == 'workflow_dispatch'
