@@ -17,7 +17,7 @@ jobs:
         run: |
           IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
           echo $IMAGE
-          ${{ env.IMAGES }}=$IMAGE
+          export IMAGES=$IMAGE
 
       - name: Inspect images
         run: |
