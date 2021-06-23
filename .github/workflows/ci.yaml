@@ -4,8 +4,6 @@ on: pull_request
 jobs:
 
   Test:
-    env:
-      IMAGE: ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,12 +14,12 @@ jobs:
         
       - name: Get list images 
         run: |
-          export IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
-          echo ${{ env.IMAGE }}
+          IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
+          echo $IMAGE
 
       - name: Inspect images
         run: |
-          for i in ${{ env.IMAGE }}
+          for i in $IMAGE
           do
             docker image inspect $i
           done  
