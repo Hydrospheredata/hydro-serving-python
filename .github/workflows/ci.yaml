@@ -16,8 +16,12 @@ jobs:
         
       - name: Get list images 
         run: |
-          export IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
-          echo $IMAGE
+          ${{ env.IMAGE }}=$(docker images | grep serving-runtime | awk '{print $3}')
+          echo ${{ env.IMAGE }}
 
       - name: Inspect images
-        run: for i in $IMAGE; do [docker image inspect $i]; done          
+        run: |
+          for i in ${{ env.IMAGE }}
+          do
+            docker image inspect $i
+          done  
