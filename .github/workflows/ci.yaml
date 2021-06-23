@@ -12,4 +12,8 @@ jobs:
       - name: Build image
         run: "make python-all -e VERSION=${{ github.sha }}"
         
-          
+      - name: Get list images 
+        run: export IMAGE=$(docker images | grep serving-runtime | awk '{print $3}')
+
+      - name: Inspect images
+        run: for i in $IMAGE; do [docker image inspect $i]; done          
