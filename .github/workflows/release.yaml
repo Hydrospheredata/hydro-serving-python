@@ -1,5 +1,5 @@
 name: Release
-
+ 
 on:
   push:
     branches:
@@ -34,7 +34,7 @@ jobs:
   Release:
     runs-on: ubuntu-latest
     env:
-      BUMP: prerelease # default values for push-triggered run
+      BUMP: ${{ github.event.inputs.bump }} # default values for push-triggered run
       RELEASE: local
       IMAGES: ''
     steps:
@@ -86,7 +86,8 @@ jobs:
           
       - name: Setup poetry
         uses: abatilo/actions-poetry@v2.1.0
-        
+
+      # Bump version  
       - name: Bump sdk
         if: github.event.inputs.sdk_version == '' && env.RELEASE == 'local'
         run: |
@@ -109,10 +110,12 @@ jobs:
         if: github.events.inputs.version == ''
         run: make python-all -e VERSION=${{ env.BUMP }}
         
+      # Build images  
       - name: Build with force version
         if: github.events.inputs.version != ''
         run: make python-all -e VERSION=${{ github.events.inputs.version }}
-        
+
+      # Push images        
       - name: Docker Login
         uses: docker/login-action@v1.9.0
         with:
