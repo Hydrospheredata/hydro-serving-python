@@ -51,6 +51,7 @@ class PythonGRPCService(PredictionServiceServicer, HealthServicer):
 
     def Predict(self, request, context):
         self.logger.info("Received inference request: {}".format(request)[:256])
+        numpy_outputs = {}
         try:
             numpy_request_inputs: Dict[str] = {k: tensor_proto_to_np(t) for k, t in request.inputs.items()}
             numpy_outputs: Dict[str] = self.executable(**numpy_request_inputs)
