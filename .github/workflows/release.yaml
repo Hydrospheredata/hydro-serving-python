@@ -91,7 +91,7 @@ jobs:
       - name: Bump sdk
         if: github.event.inputs.sdk_version == '' && env.RELEASE == 'local'
         run: |
-          SDK_VERSION=$(curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r '.releases | keys[-1]')
+          SDK_VERSION=$(curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r '.releases | keys[]' | sort -V | tail -n 1)
           echo $SDK_VERSION
           poetry add hydrosdk=$SDK_VERSION
           
@@ -134,20 +134,36 @@ jobs:
           do
             docker push hydrosphere/$i
           done  
-        
+
+
+      # Set variables
+      - name: Set VERSION variable
+        if: github.event_name == 'workflow_dispatch'
+        run: echo VERSION=$(poetry version -s) >> $GITHUB_ENV
+
+        # Commit changes
+      - name: Commit new version
+        if: github.event_name == 'workflow_dispatch'
+        run: "echo ${{ env.VERSION }} > version"
+
       - name: Tag and push changes
         id: tag
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -a --allow-empty -m "release version $(poetry version -s)"
-          git tag $(poetry version -s)
+          git commit -a --allow-empty -m "release version ${{ env.VERSION }}"
           git push
-          git push --tags
 
       - name: Reports
         id: generate-output
-        run: echo "::set-output name=tag-output::$(poetry version -s)"
+        run: echo "::set-output name=tag-output::${{ env.VERSION }}"
+
+      - name: Create github release
+        if: github.event_name == 'workflow_dispatch'
+        uses: meeDamian/github-release@2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.VERSION }}
 
     outputs:
       tag: ${{ steps.generate-output.outputs.tag-output }}
