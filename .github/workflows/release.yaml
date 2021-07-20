@@ -88,12 +88,12 @@ jobs:
         uses: abatilo/actions-poetry@v2.1.0
 
       # Bump version  
-      - name: Bump sdk
-        if: github.event.inputs.sdk_version == '' && env.RELEASE == 'local'
-        run: |
-          SDK_VERSION=$(curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r '.releases | keys[]' | sort -V | tail -n 1)
-          echo $SDK_VERSION
-          poetry add hydrosdk=$SDK_VERSION
+      # - name: Bump sdk
+      #   if: github.event.inputs.sdk_version == '' && env.RELEASE == 'local'
+      #   run: |
+      #     SDK_VERSION=$(curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r '.releases | keys[]' | sort -V | tail -n 1)
+      #     echo $SDK_VERSION
+      #     poetry add hydrosdk=$SDK_VERSION
           
       - name: Bump sdk to latest stable version
         if: github.event.inputs.sdk_version == '' && env.RELEASE == 'global'
