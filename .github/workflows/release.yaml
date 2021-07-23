@@ -125,7 +125,7 @@ jobs:
       - name: Get list images 
         id: get-images
         run: |
-          echo IMAGES=$(docker images | grep serving-runtime | awk '{print $1":"$2}'') >> $GITHUB_ENV
+          echo IMAGES=$(docker images | grep serving-runtime | awk '{print $1":"$2}') >> $GITHUB_ENV
 
       - name: Push image
         run: |
