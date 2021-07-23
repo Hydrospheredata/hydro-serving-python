@@ -105,10 +105,24 @@ jobs:
       - name: Set manual sdk version
         if: github.event.inputs.sdk_version != ''
         run: poetry add hydrosdk=${{ github.event.inputs.sdk_version }}
-                  
+
+      - name: bump version
+        if: github.events.inputs.version == ''
+        run: poetry version ${{ env.BUMP }}
+        
+      - name: force bump version
+        if: github.events.inputs.version != ''
+        run: poetry version ${{ github.events.inputs.version }}
+
+      - name: Add version env
+        run: echo VERSION=$(poetry version -s) >> $GITHUB_ENV
+      
+      - name: Save new version 
+        run: echo ${{ env.VERSION }} > version
+
       - name: Build with version
         if: github.events.inputs.version == ''
-        run: make python-all -e VERSION=${{ env.BUMP }}
+        run: make python-all -e VERSION=${{ env.VERSION }}
         
       # Build images  
       - name: Build with force version
