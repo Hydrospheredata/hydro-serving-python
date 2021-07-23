@@ -146,7 +146,7 @@ jobs:
           echo ${{ env.IMAGES }}
           for i in ${{ env.IMAGES }}
           do
-            docker push hydrosphere/$i
+            docker push $i
           done  
 
 
