@@ -140,6 +140,7 @@ jobs:
         id: get-images
         run: |
           echo IMAGES=$(docker images | grep serving-runtime | awk '{print $1":"$2}') >> $GITHUB_ENV
+          echo "::set-output name=images-output::${{ env.IMAGES }}"
 
       - name: Push image
         run: |
@@ -181,6 +182,7 @@ jobs:
 
     outputs:
       tag: ${{ steps.generate-output.outputs.tag-output }}
+      images: ${{ steps.get-images.outputs.images-output }}
           
   slackNotification:
     name: Slack Notification
@@ -197,7 +199,7 @@ jobs:
         SLACK_ICON: https://avatars.githubusercontent.com/u/17550625?s=200&v=4
         SLACK_COLOR: ${{ job.status }}
         SLACK_TITLE: Build status - success
-        SLACK_MESSAGE: "Releasing ${{ env.IMAGES }} :rocket:"
+        SLACK_MESSAGE: "Releasing ${{ needs.Release.outputs.images }} with ${{ needs.Release.outputs.tag }} tag :rocket:"
         MSG_MINIMAL: true
 
     - name: Slack Notification failure
