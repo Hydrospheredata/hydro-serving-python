@@ -13,7 +13,7 @@ VOLUME /model
 LABEL DEPLOYMENT_TYPE=APP
 
 RUN apt-get update && \
-    apt-get -y install wget libgomp1 curl
+    apt-get -y install wget curl sudo
 
 RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
     chmod +x /bin/grpc_health_probe
@@ -38,6 +38,7 @@ RUN useradd -u 42069 app && \
     chown app /app && \
     chmod +x /app/start.sh
 
+RUN echo "app ALL=NOPASSWD: /usr/bin/apt" > /etc/sudoers
 USER app
 
 CMD ["/app/start.sh"]
