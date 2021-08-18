@@ -2,10 +2,7 @@ PYTHON_EXEC=python
 VERSION=dev
 
 .PHONY: python-all
-python-all: python-3.7 python-3.8
-
-.PHONY: python
-python: python-latest
+python-all: python-3.7 python-3.8.11
 
 .PHONY: python-%
 python-%:

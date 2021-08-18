@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cd /app/src
-PYTHONPATH=/app:/app/src/ python3 main.py
+cd /home/app/src
+PYTHONPATH=/home/app:/home/app/src/ python3 main.py

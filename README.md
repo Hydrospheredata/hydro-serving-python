@@ -2,11 +2,10 @@
 Python runtime for [Hydrosphere Serving](https://github.com/Hydrospheredata/hydro-serving).
 Provides a GRPC API for Python scripts.
 
-Supported versions are: python-3.6 python-3.7 python-3.8 
+Supported versions are: python-3.7 python-3.8 
 
 ## Build commands
 - `make test`
-- `make python` - build docker runtime with python:latest-alpine base image
 - `make python-${VERSION}` - build docker runtime with python:${VERSION}-alpine base image
 - `make clean` - clean repository from temp files
 
