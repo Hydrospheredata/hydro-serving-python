@@ -125,19 +125,19 @@ protobuf = ">=3.6.0"
 
 [[package]]
 name = "hydro-serving-grpc"
-version = "3.0.0.dev3"
-description = "hydro-serving-protos"
+version = "3.0.0"
+description = "Protobuf messages and GRPC API for Hydrosphere Serving platform"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6,<4.0"
 
 [package.dependencies]
-grpcio = ">=1.7.0"
-protobuf = ">=3.6.1"
+grpcio = ">=1.38.0,<2.0.0"
+protobuf = ">=3.17.2,<4.0.0"
 
 [[package]]
 name = "hydrosdk"
-version = "3.0.0a5"
+version = "3.0.0"
 description = " This package's purpose is to provide a simple and convenient way of integrating user's workflow scripts with Serving API."
 category = "main"
 optional = false
@@ -145,7 +145,7 @@ python-versions = ">=3.6.2,<4.0.0"
 
 [package.dependencies]
 docker-image-py = ">=0.1.10,<0.2.0"
-hydro-serving-grpc = "3.0.0.dev3"
+hydro-serving-grpc = "3.0.0"
 importlib_metadata = ">=1.7.0,<2.0.0"
 numpy = "1.18.3"
 pandas = ">=1.1.5"
@@ -502,7 +502,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "1a4c2d32ddfbe5f5e304c6809c309ff21a1dbceec16063103beb3f70f978faae"
+content-hash = "6653a7e9bd1663a6aea1c4f7bef294d87a2e6f0dd098591a43da176d45b6a083"
 
 [metadata.files]
 appdirs = [
@@ -539,6 +539,7 @@ docker = [
 ]
 docker-image-py = [
     {file = "docker-image-py-0.1.10.tar.gz", hash = "sha256:2629760de8f230096b7e87aceba07e2e863a72da4da24b914153bee505774af7"},
+    {file = "docker_image_py-0.1.10-py3-none-any.whl", hash = "sha256:b120f5ff9a00f0829e07f26b975c811e469dc073c48ad216ee91d4632cfe1d9e"},
 ]
 filelock = [
     {file = "filelock-3.0.12-py3-none-any.whl", hash = "sha256:929b7d63ec5b7d6b71b0fa5ac14e030b3f70b75747cef1b10da9b879fef15836"},
@@ -601,11 +602,12 @@ grpcio-health-checking = [
     {file = "grpcio-health-checking-1.28.1.tar.gz", hash = "sha256:6d29a88cad605e7b5801050c636c4a4daa326f5dc140d8194bf3ceba418e7ce6"},
 ]
 hydro-serving-grpc = [
-    {file = "hydro_serving_grpc-3.0.0.dev3-py3-none-any.whl", hash = "sha256:5f68c7c3b859608c21bf857ca59bea60d29390c5dfba2ec7c76a6644717b2b23"},
+    {file = "hydro_serving_grpc-3.0.0-py3-none-any.whl", hash = "sha256:b5fc5b5a5f959fed3aecfad5f8a0fe2ea35f7809a49e2c8a7bd82b28650ab2ba"},
+    {file = "hydro_serving_grpc-3.0.0.tar.gz", hash = "sha256:7d28ecaced75faffbee138107e0b48ea573de5ecacf142f2982ede7be73b8c6f"},
 ]
 hydrosdk = [
-    {file = "hydrosdk-3.0.0a5-py3-none-any.whl", hash = "sha256:9ed38f8fe76e11afead5011ff3e05087db753daaeed22687489c58f83a52899b"},
-    {file = "hydrosdk-3.0.0a5.tar.gz", hash = "sha256:bb2a3f79a1c1a7911ee06ddda6b263cb568f472f1a35ef5cc507730406eef75d"},
+    {file = "hydrosdk-3.0.0-py3-none-any.whl", hash = "sha256:21fb8dcccaa9b9f2c8aec33c90c426757fab08758ef4ce8a1c34d644ed404256"},
+    {file = "hydrosdk-3.0.0.tar.gz", hash = "sha256:538933b7ca43e9cd04bfa737160628870768267e551e30da4e206adb6dec440b"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
@@ -695,9 +697,13 @@ protobuf = [
     {file = "protobuf-3.17.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:2ae692bb6d1992afb6b74348e7bb648a75bb0d3565a3f5eea5bec8f62bd06d87"},
     {file = "protobuf-3.17.3-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:99938f2a2d7ca6563c0ade0c5ca8982264c484fdecf418bd68e880a7ab5730b1"},
     {file = "protobuf-3.17.3-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:6902a1e4b7a319ec611a7345ff81b6b004b36b0d2196ce7a748b3493da3d226d"},
+    {file = "protobuf-3.17.3-cp38-cp38-win32.whl", hash = "sha256:59e5cf6b737c3a376932fbfb869043415f7c16a0cf176ab30a5bbc419cd709c1"},
+    {file = "protobuf-3.17.3-cp38-cp38-win_amd64.whl", hash = "sha256:ebcb546f10069b56dc2e3da35e003a02076aaa377caf8530fe9789570984a8d2"},
     {file = "protobuf-3.17.3-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:4ffbd23640bb7403574f7aff8368e2aeb2ec9a5c6306580be48ac59a6bac8bde"},
     {file = "protobuf-3.17.3-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:26010f693b675ff5a1d0e1bdb17689b8b716a18709113288fead438703d45539"},
     {file = "protobuf-3.17.3-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:e76d9686e088fece2450dbc7ee905f9be904e427341d289acbe9ad00b78ebd47"},
+    {file = "protobuf-3.17.3-cp39-cp39-win32.whl", hash = "sha256:a38bac25f51c93e4be4092c88b2568b9f407c27217d3dd23c7a57fa522a17554"},
+    {file = "protobuf-3.17.3-cp39-cp39-win_amd64.whl", hash = "sha256:85d6303e4adade2827e43c2b54114d9a6ea547b671cb63fafd5011dc47d0e13d"},
     {file = "protobuf-3.17.3-py2.py3-none-any.whl", hash = "sha256:2bfb815216a9cd9faec52b16fd2bfa68437a44b67c56bee59bc3926522ecb04e"},
     {file = "protobuf-3.17.3.tar.gz", hash = "sha256:72804ea5eaa9c22a090d2803813e280fb273b62d5ae497aaf3553d141c4fdd7b"},
 ]
