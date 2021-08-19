@@ -45,10 +45,6 @@ HEALTHCHECK --start-period=10s CMD /bin/grpc_health_probe -addr=:${APP_PORT}
 COPY --from=build --chown=app:app /bin/grpc_health_probe /bin/grpc_health_probe
 COPY --from=build --chown=app:app $VENV_PATH $VENV_PATH
 
-ENV MODEL_DIR=/model
-
-VOLUME /model
-
 COPY --chown=app:app src/ /home/app/src/
 COPY --chown=app:app start.sh start.sh
 
