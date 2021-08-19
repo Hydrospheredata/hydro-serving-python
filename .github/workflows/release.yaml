@@ -37,6 +37,8 @@ jobs:
       BUMP: ${{ github.event.inputs.bump }} # default values for push-triggered run
       RELEASE: local
       IMAGES: ''
+      VERSION: ${{ github.event.inputs.version }}
+      SDK_VERSION: ${{ github.event.inputs.sdk_version }}
     steps:
       - name: Validate inputs  #TODO create an action for this
         if: github.event_name == 'workflow_dispatch'
@@ -75,6 +77,8 @@ jobs:
           
           echo BUMP=${{ github.event.inputs.bump }} >> $GITHUB_ENV
           echo RELEASE=${{ github.event.inputs.release }} >> $GITHUB_ENV
+          echo VERSION=${{ github.event.inputs.version }} >> $GITHUB_ENV
+          echo SDK_VERSION=${{ github.event.inputs.sdk_version }} >> $GITHUB_ENV
               
       - name: Checkout
         uses: actions/checkout@v2
@@ -96,23 +100,23 @@ jobs:
       #     poetry add hydrosdk=$SDK_VERSION
           
       - name: Bump sdk to latest stable version
-        if: github.event.inputs.sdk_version == '' && env.RELEASE == 'global'
+        if: env.SDK_VERSION == '' && env.RELEASE == 'global'
         run: |
           SDK_VERSION=$(curl -Ls https://pypi.org/pypi/hydrosdk/json | jq -r .info.version)
           echo $SDK_VERSION
           poetry add hydrosdk=$SDK_VERSION
           
       - name: Set manual sdk version
-        if: github.event.inputs.sdk_version != ''
-        run: poetry add hydrosdk=${{ github.event.inputs.sdk_version }}
+        if: env.SDK_VERSION != ''
+        run: poetry add hydrosdk=${{ env.SDK_VERSION }}
 
       - name: bump version
-        if: github.events.inputs.version == ''
+        if: env.VERSION == ''
         run: poetry version ${{ env.BUMP }}
         
       - name: force bump version
-        if: github.events.inputs.version != ''
-        run: poetry version ${{ github.events.inputs.version }}
+        if: env.VERSION != ''
+        run: poetry version ${{ env.VERSION }}
 
       - name: Add version env
         run: echo VERSION=$(poetry version -s) >> $GITHUB_ENV
@@ -121,13 +125,7 @@ jobs:
         run: echo ${{ env.VERSION }} > version
 
       - name: Build with version
-        if: github.events.inputs.version == ''
         run: make python-all -e VERSION=${{ env.VERSION }}
-        
-      # Build images  
-      - name: Build with force version
-        if: github.events.inputs.version != ''
-        run: make python-all -e VERSION=${{ github.events.inputs.version }}
 
       # Push images        
       - name: Docker Login
@@ -149,12 +147,6 @@ jobs:
           do
             docker push $i
           done  
-
-
-      # Set variables
-      - name: Set VERSION variable
-        if: github.event_name == 'workflow_dispatch'
-        run: echo VERSION=$(poetry version -s) >> $GITHUB_ENV
 
         # Commit changes
       - name: Commit new version
