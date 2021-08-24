@@ -2,3 +2,9 @@
 test
 .idea
 venv
+.dockerignore
+.github
+.gitignore
+jenkinsfile.disable.groovy
+Dockerfile*
+README.md
